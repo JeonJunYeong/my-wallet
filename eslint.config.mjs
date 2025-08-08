@@ -10,7 +10,20 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],  // Linting 할 대상 명확히 지정
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+        tsconfigRootDir: __dirname,
+        sourceType: "module",
+      },
+    },
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+  },
+  ...compat.extends("next/core-web-vitals", "next/typescript",'plugin:prettier/recommended'),
+]
 
 export default eslintConfig;
