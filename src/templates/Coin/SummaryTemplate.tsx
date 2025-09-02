@@ -1,10 +1,11 @@
-import { Label } from "@/components/Label/Label";
-import { Box } from "@/components/Box/Box";
 import React from "react";
+
 import ResponsiveGridLayout from "@/layouts/ResponsiveGridLayout";
+import { Box } from "@/components/Box/Box";
+import { Label } from "@/components/Label/Label";
 import { CurrencyText } from "@/components/Text/CurrencyTextProps";
 
-export const WalletSummary = () => {
+export default function SummaryTemplate() {
   return (
     <ResponsiveGridLayout cols={2}>
       <Box rounded={"rounded-3xl"}>
@@ -17,15 +18,18 @@ export const WalletSummary = () => {
       <Box rounded={"rounded-3xl"}>
         <Label text="Group 2" />
       </Box>
-      {/*<div style={{ width: 480 }}>*/}
-      {/*  <h3 className="mb-2">SequentialProgressBar Demo</h3>*/}
-      {/*  <SequentialProgressBar*/}
-      {/*    segments={segments}*/}
-      {/*    total={100}*/}
-      {/*    height="1.5rem"*/}
-      {/*    showLabels={true}*/}
-      {/*  />*/}
-      {/*</div>*/}
+      <Box rounded={"rounded-3xl"}>
+        <Label text="Group 2" />
+      </Box>
+      <Box rounded={"rounded-3xl"}>
+        <Label text="Group 2" />
+      </Box>
+      <Box rounded={"rounded-3xl"}>
+        <Label text="Group 2" />
+      </Box>
+      <Box rounded={"rounded-3xl"}>
+        <Label text="Group 2" />
+      </Box>
     </ResponsiveGridLayout>
   );
-};
+}

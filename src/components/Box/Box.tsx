@@ -1,5 +1,7 @@
+"use client";
+
 import { Theme, themes } from "@/types/theme";
-import { useTheme } from "@/stores/useTheme";
+import { useThemeStore } from "@/stores/useTheme";
 
 interface BoxProps {
   title?: string;
@@ -8,7 +10,7 @@ interface BoxProps {
 }
 
 export const Box = ({ title, children, rounded }: BoxProps) => {
-  const { theme } = useTheme();
+  const { theme } = useThemeStore();
 
   const className = `p-4 ${rounded ? rounded : "rounded"} shadow ${themes[theme]}`;
 

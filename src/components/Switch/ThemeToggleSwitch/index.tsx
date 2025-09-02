@@ -1,13 +1,14 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/stores/useTheme";
+import { useThemeStore } from "@/stores/useTheme";
 
 interface ThemeToggleSwitchProps {
   isDark: boolean;
 }
 const ThemeToggleSwitch: React.FC<ThemeToggleSwitchProps> = ({ isDark }) => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeStore();
+
   return (
     <button
       onClick={() => {
@@ -23,7 +24,7 @@ const ThemeToggleSwitch: React.FC<ThemeToggleSwitchProps> = ({ isDark }) => {
         `}
       >
         <div className="absolute inset-0 flex items-center justify-center text-gray-600 text-sm">
-          {isDark ? <Moon size={16} /> : <Sun size={16} />}
+          {theme ? <Moon size={16} /> : <Sun size={16} />}
         </div>
       </div>
     </button>

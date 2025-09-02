@@ -1,17 +1,24 @@
 @import "tailwindcss";
 
+/* 기본 (라이트) 테마 */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Tailwind에서 색상, 폰트를 변수로 매핑 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
+/* 다크모드 (class 기반) */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+/* 다크모드 (OS 설정 기반) — class를 안 쓸 경우에도 적용됨 */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,6 +26,7 @@
   }
 }
 
+/* body 스타일 */
 body {
   background: var(--background);
   color: var(--foreground);

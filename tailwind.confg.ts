@@ -3,14 +3,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: {
-          light: "#ffffff",
-          dark: "#0f172a",
-        },
-        text: {
-          light: "#0f172a",
-          dark: "#ffffff",
-        },
+        background: "var(--color-background)",
+        text: "var(--color-text)",
+      },
+      fontFamily: {
+        pretendard: ["var(--font-pretendard)"],
       },
     },
   },
