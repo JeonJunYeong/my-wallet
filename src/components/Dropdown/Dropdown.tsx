@@ -3,12 +3,19 @@ import { useState } from "react";
 
 type DropdownProps = {
   options: { key: string; value: string }[];
+  selectedValue?: string;
   onSelect?: (value: string) => void;
 };
 
-const Dropdown: React.FC<DropdownProps> = ({ options, onSelect }) => {
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  onSelect,
+  selectedValue,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(
+    selectedValue ?? null,
+  );
 
   const handleSelect = (option: string) => {
     setSelected(option);
