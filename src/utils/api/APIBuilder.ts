@@ -1,7 +1,7 @@
 import API, { HTTPHeaders, HTTPMethod, HTTPParams } from './API';
 
 // const apiHost = 'https://erphelp.douzone.com/ai/api';
-const apiHost = 'http://localhost:5554';
+const apiHost = 'http://172.30.1.27:5001';
 // const apiHost = 'https://m365.douzone.com';
 // const apiHost = 'https://dev2.comet.duzon.net';
 

@@ -6,6 +6,7 @@ type Column<T> = {
   key: string;
   label: string;
   sortable?: boolean;
+  button?: boolean
   className?: string;
 };
 
@@ -16,6 +17,7 @@ type Props<T> = {
   pageSize?: number;
   searchable?: boolean;
   renderSubRow?: (row: T) => ReactNode; // 서브로우 렌더링
+  onButtonClick?: () => void;
 };
 export default function Table<T extends Record<string, unknown>>({
   columns,
@@ -23,7 +25,7 @@ export default function Table<T extends Record<string, unknown>>({
   onRowSelect,
   pageSize = 10,
   searchable = true,
-  renderSubRow,
+  renderSubRow,onButtonClick
 }: Props<T>) {
   const store = useTableStore(data, pageSize);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -84,14 +86,19 @@ export default function Table<T extends Record<string, unknown>>({
         <table className="min-w-full divide-y table-auto">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map((col: Column<T>) => (
+              {columns.map((col: Column<T>,index) => (
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col)}
                   className={`px-4 py-3 text-left text-sm font-medium uppercase tracking-wider select-none`}
                 >
                   <div className="flex items-center gap-2">
-                    <span>{String(col.label)}</span>
+                    {
+                        col.button? (
+                            <button onClick={onButtonClick}>{String(col.label)}</button>
+                        ):  <span>{String(col.label)}</span>
+                    }
+
                     {col.sortable && (
                       <span className="text-gray-400 text-xs">
                         {sortKey === col.key
@@ -101,6 +108,7 @@ export default function Table<T extends Record<string, unknown>>({
                           : "⇅"}
                       </span>
                     )}
+
                   </div>
                 </th>
               ))}
@@ -121,7 +129,7 @@ export default function Table<T extends Record<string, unknown>>({
                 const globalIdx = (page - 1) * pageSize + i;
                 const isSelected = selectedRow === globalIdx;
                 return (
-                  <>
+                  <React.Fragment key={i}>
                     <tr
                       key={globalIdx}
                       onClick={() => handleRowClick(globalIdx)}
@@ -143,7 +151,7 @@ export default function Table<T extends Record<string, unknown>>({
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })
             )}

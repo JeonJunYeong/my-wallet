@@ -7,9 +7,28 @@ type AccountInfo = {
 
 export const accountApi = {
   getAccountInfo: async () => {
-    return [
-      { userId: "3cfd9c6d-5d1e-4c11-81c0-e075bce3684d", userName: "홍길동" },
-    ] as AccountInfo[];
-    // return APIBuilder.get("/api/accounts").build().call<AccountInfo>();
+
+    const data = await APIBuilder.get("/order/get/user/list").build().call<AccountInfo>()
+    return data['data'] as AccountInfo[];
   },
+  getOrderInfo: async(id: string) => {
+    const data = await  APIBuilder.get("/order/get/list",).params({id}).build().call()
+
+    const unique = data['data'].filter(
+        (item, index, self) =>
+            index === self.findIndex((t) => t.name === item.name)
+    );
+
+    return unique;
+  },
+  getDetailOrderInfo: async(name: string) => {
+
+    console.log(name)
+    const data = await APIBuilder.get("/order/get/detail/list").params({name}).build().call();
+
+    return data['data'];
+  }
+
+
+
 };
