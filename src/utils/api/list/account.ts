@@ -21,12 +21,17 @@ export const accountApi = {
 
     return unique;
   },
-  getDetailOrderInfo: async(name: string) => {
+  getDetailOrderInfo: async(name: string,userId: string) => {
 
-    console.log(name)
-    const data = await APIBuilder.get("/order/get/detail/list").params({name}).build().call();
+    const data = await APIBuilder.get("/order/get/detail/list").params({name,userId}).build().call();
 
     return data['data'];
+  },
+  callOrder: async(type:'open' | 'close' | 'allClose' ,userId: string,orderId: string,name: string,count:string ,side: string)=>{
+
+    const data = await APIBuilder.post("/order/call",{type,userId,name,count,side,orderId}).build().call();
+
+    // return data['data'];
   }
 
 

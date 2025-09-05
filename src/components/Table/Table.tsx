@@ -7,6 +7,7 @@ type Column<T> = {
   label: string;
   sortable?: boolean;
   button?: boolean
+  onButtonClick?: (col:any) => void;
   className?: string;
 };
 
@@ -17,7 +18,6 @@ type Props<T> = {
   pageSize?: number;
   searchable?: boolean;
   renderSubRow?: (row: T) => ReactNode; // 서브로우 렌더링
-  onButtonClick?: () => void;
 };
 export default function Table<T extends Record<string, unknown>>({
   columns,
@@ -25,10 +25,10 @@ export default function Table<T extends Record<string, unknown>>({
   onRowSelect,
   pageSize = 10,
   searchable = true,
-  renderSubRow,onButtonClick
+  renderSubRow
 }: Props<T>) {
   const store = useTableStore(data, pageSize);
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<number | null>(null);
   const {
     query,
     setQuery,
@@ -53,14 +53,8 @@ export default function Table<T extends Record<string, unknown>>({
       onRowSelect(row);
     }
     setSelectedRow(idx);
-    // setExpandedRows(new Set(idx));
+    setExpandedRows(idx=== expandedRows ? null : idx);
 
-    setExpandedRows((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(idx)) newSet.delete(idx);
-      else newSet.add(idx);
-      return newSet;
-    });
   }
 
   return (
@@ -88,15 +82,13 @@ export default function Table<T extends Record<string, unknown>>({
             <tr>
               {columns.map((col: Column<T>,index) => (
                 <th
-                  key={col.key}
+                  key={index}
                   onClick={() => toggleSort(col)}
                   className={`px-4 py-3 text-left text-sm font-medium uppercase tracking-wider select-none`}
                 >
                   <div className="flex items-center gap-2">
                     {
-                        col.button? (
-                            <button onClick={onButtonClick}>{String(col.label)}</button>
-                        ):  <span>{String(col.label)}</span>
+                       <span>{String(col.label)}</span>
                     }
 
                     {col.sortable && (
@@ -135,16 +127,24 @@ export default function Table<T extends Record<string, unknown>>({
                       onClick={() => handleRowClick(globalIdx)}
                       className={`cursor-pointer hover:bg-gray-100 ${isSelected ? "bg-blue-100" : ""}`}
                     >
-                      {columns.map((col) => (
+                      {columns.map((col,index) => (
                         <td
-                          key={col.key}
+                          key={index}
                           className="px-4 py-3 text-sm break-words max-w-[280px]"
                         >
-                          {String(row[col.key] ?? "-")}
+                          {
+                            col.button ?  <button
+                                className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
+                                // onClick={()=>col.onButtonClick}
+                                onClick={()=>{col.onButtonClick(col,row)}}
+                            >
+                              {col.label}
+                            </button> :     String(row[col.key] ?? "-")
+                          }
                         </td>
                       ))}
                     </tr>
-                    {expandedRows.has(i) && renderSubRow && (
+                    {expandedRows === i && renderSubRow && (
                       <tr className="bg-gray-50">
                         <td colSpan={columns.length} className="p-2">
                           {renderSubRow(row)}

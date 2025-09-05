@@ -2,7 +2,7 @@
 
 import Modal from "@/components/Modal/Modal";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 
 interface OrderBuyModalProps {
   name: string;
@@ -15,7 +15,16 @@ interface OrderBuyModalProps {
 export default function OrderBuyModal(props: OrderBuyModalProps) {
   const { name, onSave, count, side, id } = props;
   const [countValue, setCountValue] = useState(count);
-  const [selectSide, setSelectSide] = useState("");
+  const [selectSide, setSelectSide] = useState(side);
+
+
+  useEffect(() => {
+    setCountValue(count);
+  }, [count]);
+
+  useEffect(() => {
+    setSelectSide(side);
+  }, [side]);
 
   return (
     <Modal
@@ -34,13 +43,13 @@ export default function OrderBuyModal(props: OrderBuyModalProps) {
       />
       <Dropdown
         options={[
-          { key: "Buy", value: "Buy" },
-          { key: "Sell", value: "Sell" },
+          { key: "buy", value: "buy" },
+          { key: "sell", value: "sell" },
         ]}
         onSelect={(value) => {
           setSelectSide(value);
         }}
-        selectedValue={side}
+        selectedValue={side || ''}
       />
     </Modal>
   );
