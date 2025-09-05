@@ -45,46 +45,56 @@ export default function InfoTableGroupTemplate({ value }: Props) {
 
   const onRowSelect = async (data: { userId: string; userName: string }) => {
     const result = await accountApi.getOrderInfo(data.userId);
+
     setSelectedGroup(selectedGroup === data.userId ? null : data.userId);
     setDetailData(result);
 
     // setSelectUserId(data.userId);
-
   };
 
   const onDetailRowSelect = async (data) => {
     const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
-
     setDetailDataOrderInfo(result);
     setSelectName(data.name);
-
   };
 
   const callPopup = async (col) => {
     setOrderType("close");
 
-    // setSelectCount(col.count);
-    // setCloseSide(col.side === "buy" ? "sell" : "buy");
-    // setSelectOrderId(col.orderId);
+    setSelectCount(col.count);
+    setCloseSide(col.side === "buy" ? "sell" : "buy");
+    setSelectOrderId(col.orderId);
+    setSelectUserId(col.userId);
 
-    // open();
+    open();
   };
 
-  const closeOrder = (col, row) => {
-    // accountApi.callOrder(
-    //   "allClose",
-    //   selectUserId,
-    //   selectOrderId,
-    //   row.name,
-    //   "0",
-    //   "0",
-    // );
+  const closeOrder = (row) => {
+    accountApi.callOrder(
+      "allClose",
+      row.userId,
+      row.orderId,
+      row.name,
+      "0",
+      "0",
+    );
   };
 
-  const openOrder = (col) => {
+  const openOrder = (row: {
+    count: string;
+    id: string;
+    name: string;
+    orderId: string;
+    price: number;
+    side: string;
+    userId: string;
+  }) => {
+    setSelectName(row.name);
     setOrderType("open");
     setSelectCount("0");
     setCloseSide("buy");
+    setSelectOrderId(row.orderId);
+    setSelectUserId(row.userId);
 
     open();
   };
@@ -95,14 +105,24 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     count: string,
     side: string,
   ) => {
-    accountApi.callOrder(
+    console.log(
+      "Params :::",
       orderType,
-      selectUserId,
-      selectOrderId,
       name,
       count,
       side,
+      selectUserId,
+      selectOrderId,
     );
+
+    // accountApi.callOrder(
+    //   orderType,
+    //   selectUserId,
+    //   selectOrderId,
+    //   name,
+    //   count,
+    //   side,
+    // );
   };
 
   const renderSubRow = () => {
@@ -176,7 +196,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
         <Card title="그룹 정보">
           {data.map((item, index) => {
             return (
-              <>
+              <React.Fragment key={index}>
                 <SelectableBox
                   key={index}
                   selected={selectedGroup === item.userId}
@@ -190,7 +210,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
                   </div>
                 </SelectableBox>
                 <div className={"mb-4"}></div>
-              </>
+              </React.Fragment>
             );
           })}
         </Card>
