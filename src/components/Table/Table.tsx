@@ -115,7 +115,7 @@ export default function Table<T extends Record<string, unknown>>({
                               className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
                               // onClick={()=>col.onButtonClick}
                               onClick={() => {
-                                col.onButtonClick(col, row);
+                                col.onButtonClick(row);
                               }}
                             >
                               {col.label}
