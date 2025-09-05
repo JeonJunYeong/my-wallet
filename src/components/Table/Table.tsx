@@ -6,8 +6,8 @@ type Column<T> = {
   key: string;
   label: string;
   sortable?: boolean;
-  button?: boolean
-  onButtonClick?: (col:any) => void;
+  button?: boolean;
+  onButtonClick?: (col: any) => void;
   className?: string;
 };
 
@@ -16,7 +16,6 @@ type Props<T> = {
   columns: Column<T>[];
   onRowSelect?: (row: T) => void;
   pageSize?: number;
-  searchable?: boolean;
   renderSubRow?: (row: T) => ReactNode; // 서브로우 렌더링
 };
 export default function Table<T extends Record<string, unknown>>({
@@ -24,8 +23,7 @@ export default function Table<T extends Record<string, unknown>>({
   data,
   onRowSelect,
   pageSize = 10,
-  searchable = true,
-  renderSubRow
+  renderSubRow,
 }: Props<T>) {
   const store = useTableStore(data, pageSize);
   const [expandedRows, setExpandedRows] = useState<number | null>(null);
@@ -53,43 +51,24 @@ export default function Table<T extends Record<string, unknown>>({
       onRowSelect(row);
     }
     setSelectedRow(idx);
-    setExpandedRows(idx=== expandedRows ? null : idx);
-
+    setExpandedRows(idx === expandedRows ? null : idx);
   }
 
   return (
     <div className="w-full">
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-        {searchable && (
-          <input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-            placeholder="검색..."
-            className="px-3 py-2 border rounded-md text-sm w-60 focus:outline-none focus:ring-2 focus:ring-offset-1"
-          />
-        )}
-        <div className="text-xs text-gray-500">총 {filtered.length}건</div>
-      </div>
-
       {/* Table container */}
       <div className="overflow-x-auto border rounded-lg">
         <table className="min-w-full divide-y table-auto">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map((col: Column<T>,index) => (
+              {columns.map((col: Column<T>, index) => (
                 <th
                   key={index}
                   onClick={() => toggleSort(col)}
                   className={`px-4 py-3 text-left text-sm font-medium uppercase tracking-wider select-none`}
                 >
                   <div className="flex items-center gap-2">
-                    {
-                       <span>{String(col.label)}</span>
-                    }
+                    {<span>{String(col.label)}</span>}
 
                     {col.sortable && (
                       <span className="text-gray-400 text-xs">
@@ -100,7 +79,6 @@ export default function Table<T extends Record<string, unknown>>({
                           : "⇅"}
                       </span>
                     )}
-
                   </div>
                 </th>
               ))}
@@ -127,20 +105,24 @@ export default function Table<T extends Record<string, unknown>>({
                       onClick={() => handleRowClick(globalIdx)}
                       className={`cursor-pointer hover:bg-gray-100 ${isSelected ? "bg-blue-100" : ""}`}
                     >
-                      {columns.map((col,index) => (
+                      {columns.map((col, index) => (
                         <td
                           key={index}
                           className="px-4 py-3 text-sm break-words max-w-[280px]"
                         >
-                          {
-                            col.button ?  <button
-                                className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
-                                // onClick={()=>col.onButtonClick}
-                                onClick={()=>{col.onButtonClick(col,row)}}
+                          {col.button ? (
+                            <button
+                              className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
+                              // onClick={()=>col.onButtonClick}
+                              onClick={() => {
+                                col.onButtonClick(col, row);
+                              }}
                             >
                               {col.label}
-                            </button> :     String(row[col.key] ?? "-")
-                          }
+                            </button>
+                          ) : (
+                            String(row[col.key] ?? "-")
+                          )}
                         </td>
                       ))}
                     </tr>

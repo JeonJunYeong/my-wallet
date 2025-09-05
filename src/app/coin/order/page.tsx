@@ -9,9 +9,9 @@ export default function Home() {
 
   return (
     <>
-      <div>
-        <AccountList setValue={setSelectedName} />
-      </div>
+      {/*<div>*/}
+      {/*  <AccountList setValue={setSelectedName} />*/}
+      {/*</div>*/}
       <div>
         <InfoTableGroupTemplate value={selectedName} />
       </div>

@@ -1,12 +1,16 @@
 import ResponsiveGridLayout from "@/layouts/ResponsiveGridLayout";
 import Table from "@/components/Table/Table";
 import { useAccountStore } from "@/stores/useAccount";
-import { useEffect, useState } from "react";
-import { useTableStore } from "@/stores/useTable";
-import ExpandableTable from "@/components/Table/ExpandableTable";
-import {accountApi} from "@/utils/api/list/account";
-import {useModal} from "@/stores/useModal";
+import React, { useEffect, useState } from "react";
+import { accountApi } from "@/utils/api/list/account";
+import { useModal } from "@/stores/useModal";
 import OrderBuyModal from "@/templates/Coin/Order/Modal/OrderBuyModal";
+import { FlexRatio } from "@/layouts/Common/FlexRatioLayout/FlexRatio";
+import Card from "@/components/Card/Card";
+import { Label } from "@/components/Label/Label";
+import { Box } from "@/components/Box/Box";
+import { SelectableBox } from "@/components/Box/SelectableBox";
+import { Title } from "@/components/Text/Title";
 type Props = {
   value: string;
 };
@@ -16,146 +20,197 @@ const columns = [
   { key: "userName", label: "Name", sortable: true },
 ];
 
-
 export default function InfoTableGroupTemplate({ value }: Props) {
   const { getAccountInfo } = useAccountStore();
 
-    const { open } = useModal();
+  const { open } = useModal();
 
-
-  const [data, setData] = useState<{ userId: string; userName: string }[]>([]);
-  const [detailData,setDetailData] = useState([]);
-  const [detailDataOrderInfo,setDetailDataOrderInfo]= useState([]);
-  const [selectName,setSelectName] = useState("");
-  const [selectCount,setSelectCount] = useState("0");
-  const [closeSide,setCloseSide] = useState("");
-  const [selectUserId,setSelectUserId] = useState("");
-  const [orderType,setOrderType] = useState<'open' | 'close'>('open');
-  const [selectOrderId,setSelectOrderId] = useState('')
-
+  const [data, setData] = useState<{ userId: string; userName: string }[]>([
+    { userId: "Test", userName: "test" },
+    { userId: "Test2", userName: "test2" },
+  ]);
+  const [detailData, setDetailData] = useState([]);
+  const [detailDataOrderInfo, setDetailDataOrderInfo] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [selectName, setSelectName] = useState("");
+  const [selectCount, setSelectCount] = useState("0");
+  const [closeSide, setCloseSide] = useState("");
+  const [selectUserId, setSelectUserId] = useState("");
+  const [orderType, setOrderType] = useState<"open" | "close">("open");
+  const [selectOrderId, setSelectOrderId] = useState("");
 
   useEffect(() => {
     getAccountInfo().then((data) => setData(data));
   }, []);
 
-  useEffect(()=> {
-      console.log("Select Count :::" , selectCount);
-  },[selectCount])
-
   const onRowSelect = async (data: { userId: string; userName: string }) => {
-      const result = await accountApi.getOrderInfo(data.userId);
-      setDetailData(result);
-      setSelectUserId(data.userId)
+    // setSelectedGroup(selectedGroup === data.userId ? null : data.userId);
+    // setSelectUserId(data.userId);
+    //
+    // const result = await accountApi.getOrderInfo(data.userId);
+    // setDetailData(result);
   };
 
   const onDetailRowSelect = async (data) => {
-      const result = await accountApi.getDetailOrderInfo(data.name,data.userId);
-        setSelectName(data.name);
-      setDetailDataOrderInfo(result);
-
-  }
+    // const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
+    // setSelectName(data.name);
+    // setDetailDataOrderInfo(result);
+  };
 
   const callPopup = async (col) => {
-      setSelectCount(col.count);
-      setCloseSide(col.side === 'buy' ? 'sell' : 'buy');
-      setSelectOrderId(col.orderId);
-      setOrderType('close')
-      open()
-  }
+    setOrderType("close");
 
-  const closeOrder = (col,row) => {
-      accountApi.callOrder('allClose',selectUserId,selectOrderId,row.name,"0","0");
-  }
+    // setSelectCount(col.count);
+    // setCloseSide(col.side === "buy" ? "sell" : "buy");
+    // setSelectOrderId(col.orderId);
+
+    open();
+  };
+
+  const closeOrder = (col, row) => {
+    // accountApi.callOrder(
+    //   "allClose",
+    //   selectUserId,
+    //   selectOrderId,
+    //   row.name,
+    //   "0",
+    //   "0",
+    // );
+  };
 
   const openOrder = (col) => {
-       setSelectCount(col.count);
-       setCloseSide(col.side === 'buy' ? 'sell' : 'buy');
+    setOrderType("open");
 
-      setOrderType('open')
+    // setSelectCount(col.count);
+    // setCloseSide(col.side === "buy" ? "sell" : "buy");
+    //
 
-      open()
-  }
+    open();
+  };
 
-  const handleSave = (name: string, count: string, side: string) => {
-    accountApi.callOrder(orderType,selectUserId,selectOrderId,name,count,side);
-} ;
+  const handleSave = (
+    orderType: "open" | "close",
+    name: string,
+    count: string,
+    side: string,
+  ) => {
+    accountApi.callOrder(
+      orderType,
+      selectUserId,
+      selectOrderId,
+      name,
+      count,
+      side,
+    );
+  };
 
-  const renderSubRow = (row) => {
-      return (
-          <div className="p-4">
-              <table className="min-w-full border-collapse border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                  <thead className="bg-gray-100">
-                  <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
-                          Side
-                      </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
-                          Price
-                      </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
-                          Count
-                      </th>
-                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-600 border-b">
-                          Pnl
-                      </th>
-                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-600 border-b">
-                          Action
-                      </th>
+  const renderSubRow = () => {
+    return (
+      <div className="p-4">
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
+                Side
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
+                Price
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600 border-b">
+                Count
+              </th>
+              <th className="px-4 py-2 text-center text-sm font-medium text-gray-600 border-b">
+                Pnl
+              </th>
+              <th className="px-4 py-2 text-center text-sm font-medium text-gray-600 border-b">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {detailDataOrderInfo.map(
+              (
+                item: {
+                  side: string;
+                  price: string;
+                  count: string;
+                  pnl: number;
+                },
+                index,
+              ) => (
+                <tr key={index} className="hover:bg-gray-50 transition">
+                  <td className="px-4 py-2 border-b">{item.side}</td>
+                  <td className="px-4 py-2 border-b">{item.price}</td>
+                  <td className="px-4 py-2 border-b">{item.count}</td>
+                  <td className="px-4 py-2 border-b">{item.pnl.toFixed(3)}</td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <button
+                      className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
+                      onClick={() => {
+                        callPopup(item);
+                      }}
+                    >
+                      정리
+                    </button>
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {detailDataOrderInfo.map((item, index) => (
-                      <tr
-                          key={index}
-                          className="hover:bg-gray-50 transition"
-                      >
-                          <td className="px-4 py-2 border-b">{item.side}</td>
-                          <td className="px-4 py-2 border-b">{item.price}</td>
-                          <td className="px-4 py-2 border-b">{item.count}</td>
-                          <td className="px-4 py-2 border-b">{item.pnl.toFixed(3)}</td>
-                          <td className="px-4 py-2 border-b text-center">
-                              <button
-                                  className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
-                                  onClick={()=>{callPopup(item)}}
-                              >
-                                  정리
-                              </button>
-                          </td>
-                      </tr>
-                  ))}
-                  </tbody>
-              </table>
-          </div>
-      );
-  }
-
-    const detailColumns = [
-        {key: "name", label:"NAME"},
-        {key: "", label:"구매",button: true,onButtonClick:openOrder},
-        {key: "", label:"정리",button: true,onButtonClick:closeOrder},
-        //   {key: "count", label:"COUNT"}
-    ]
-
+  const detailColumns = [
+    { key: "name", label: "NAME" },
+    { key: "", label: "구매", button: true, onButtonClick: openOrder },
+    { key: "", label: "정리", button: true, onButtonClick: closeOrder },
+  ];
 
   return (
-    <ResponsiveGridLayout cols={1}>
-      <Table
-        columns={columns}
-        data={data}
-        pageSize={10}
-        searchable
-        onRowSelect={onRowSelect}
+    // <ResponsiveGridLayout cols={1}>
+    <div className="p-6 space-y-10">
+      <FlexRatio left={1} right={2} gap={4}>
+        <Card title="그룹 정보">
+          {data.map((item, index) => {
+            return (
+              <>
+                <SelectableBox
+                  key={index}
+                  selected={selectedGroup === item.userId}
+                  onSelect={() => onRowSelect(item)}
+                >
+                  <Label text="Two" theme={"blue"} />
+                  <div className={"m-1 inline-block float-right"}>
+                    <Title level={4} align="right">
+                      {item.userName}
+                    </Title>
+                  </div>
+                </SelectableBox>
+                <div className={"mb-4"}></div>
+              </>
+            );
+          })}
+        </Card>
+        <Card title="상세 정보">
+          <Table
+            data={detailData}
+            columns={detailColumns}
+            pageSize={5}
+            onRowSelect={onDetailRowSelect}
+            renderSubRow={renderSubRow}
+          />
+        </Card>
+      </FlexRatio>
+      <OrderBuyModal
+        orderTYpe={orderType}
+        name={selectName}
+        count={selectCount}
+        side={closeSide}
+        onSave={handleSave}
       />
-      <Table
-        data={detailData}
-        columns={detailColumns}
-        pageSize={5}
-        onRowSelect={onDetailRowSelect}
-        onButtonClick={closeOrder}
-        renderSubRow={renderSubRow}
-      />
-        <OrderBuyModal name={selectName} count={selectCount} side={closeSide} onSave={handleSave} />
-    </ResponsiveGridLayout>
+    </div>
+    // </ResponsiveGridLayout>
   );
 }
