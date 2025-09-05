@@ -44,17 +44,20 @@ export default function InfoTableGroupTemplate({ value }: Props) {
   }, []);
 
   const onRowSelect = async (data: { userId: string; userName: string }) => {
-    // setSelectedGroup(selectedGroup === data.userId ? null : data.userId);
+    const result = await accountApi.getOrderInfo(data.userId);
+    setSelectedGroup(selectedGroup === data.userId ? null : data.userId);
+    setDetailData(result);
+
     // setSelectUserId(data.userId);
-    //
-    // const result = await accountApi.getOrderInfo(data.userId);
-    // setDetailData(result);
+
   };
 
   const onDetailRowSelect = async (data) => {
-    // const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
-    // setSelectName(data.name);
-    // setDetailDataOrderInfo(result);
+    const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
+
+    setDetailDataOrderInfo(result);
+    setSelectName(data.name);
+
   };
 
   const callPopup = async (col) => {
@@ -64,7 +67,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     // setCloseSide(col.side === "buy" ? "sell" : "buy");
     // setSelectOrderId(col.orderId);
 
-    open();
+    // open();
   };
 
   const closeOrder = (col, row) => {
@@ -80,10 +83,8 @@ export default function InfoTableGroupTemplate({ value }: Props) {
 
   const openOrder = (col) => {
     setOrderType("open");
-
-    // setSelectCount(col.count);
-    // setCloseSide(col.side === "buy" ? "sell" : "buy");
-    //
+    setSelectCount("0");
+    setCloseSide("buy");
 
     open();
   };
