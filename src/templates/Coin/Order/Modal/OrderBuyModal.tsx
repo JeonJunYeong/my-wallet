@@ -2,21 +2,26 @@
 
 import Modal from "@/components/Modal/Modal";
 import Dropdown from "@/components/Dropdown/Dropdown";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface OrderBuyModalProps {
   name: string;
   count: string;
-  onSave: (name: string, count: string, side: string) => void;
-  side?: string;
+  onSave: (
+    orderType: "open" | "close",
+    name: string,
+    count: string,
+    side: string,
+  ) => void;
+  side: string;
   id?: string;
+  orderTYpe: "open" | "close";
 }
 
 export default function OrderBuyModal(props: OrderBuyModalProps) {
-  const { name, onSave, count, side, id } = props;
+  const { name, onSave, count, side, id, orderTYpe } = props;
   const [countValue, setCountValue] = useState(count);
   const [selectSide, setSelectSide] = useState(side);
-
 
   useEffect(() => {
     setCountValue(count);
@@ -29,7 +34,7 @@ export default function OrderBuyModal(props: OrderBuyModalProps) {
   return (
     <Modal
       title="정보 입력"
-      onSave={() => onSave(name, countValue, selectSide)}
+      onSave={() => onSave(orderTYpe, name, countValue, selectSide)}
     >
       <p className="text-gray-700">{name}</p>
       <input
@@ -41,6 +46,7 @@ export default function OrderBuyModal(props: OrderBuyModalProps) {
           setCountValue(event.target.value);
         }}
       />
+      <div className={"m-4"} />
       <Dropdown
         options={[
           { key: "buy", value: "buy" },
@@ -49,7 +55,7 @@ export default function OrderBuyModal(props: OrderBuyModalProps) {
         onSelect={(value) => {
           setSelectSide(value);
         }}
-        selectedValue={side || ''}
+        selectedValue={side || ""}
       />
     </Modal>
   );
