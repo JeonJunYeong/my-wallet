@@ -25,10 +25,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
 
   const { open } = useModal();
 
-  const [data, setData] = useState<{ userId: string; userName: string }[]>([
-    { userId: "Test", userName: "test" },
-    { userId: "Test2", userName: "test2" },
-  ]);
+  const [data, setData] = useState<{ userId: string; userName: string;balance:{total:number,unrealisedPnl:number,free:number} }[]>([]);
   const [detailData, setDetailData] = useState([]);
   const [detailDataOrderInfo, setDetailDataOrderInfo] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -38,6 +35,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
   const [selectUserId, setSelectUserId] = useState("");
   const [orderType, setOrderType] = useState<"open" | "close">("open");
   const [selectOrderId, setSelectOrderId] = useState("");
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     getAccountInfo().then((data) => setData(data));
@@ -54,19 +52,28 @@ export default function InfoTableGroupTemplate({ value }: Props) {
 
   const onDetailRowSelect = async (data) => {
     const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
-    setDetailDataOrderInfo(result);
+    setDetailDataOrderInfo(result.sort((a, b) => {
+      // 1️⃣ side 문자열 기준 정렬
+      const sideCompare = a.side.localeCompare(b.side, 'en', { sensitivity: 'base' });
+      if (sideCompare !== 0) return sideCompare;
+
+      // 2️⃣ count 숫자 기준 정렬 (같은 side일 경우)
+      return b.pnl - a.pnl; // 오름차순
+      // return b.count - a.count; // 내림차순
+    }));
     setSelectName(data.name);
   };
 
-  const callPopup = async (col) => {
-    setOrderType("close");
+  const callPopup =  (col) => {
+     setOrderType("close");
+     setSelectCount(col.count);
+     setCloseSide(col.side === "buy" ? "sell" : "buy");
+     setSelectOrderId(col.orderId);
+     setSelectUserId(col.userId);
+     setIsReady(true);
 
-    setSelectCount(col.count);
-    setCloseSide(col.side === "buy" ? "sell" : "buy");
-    setSelectOrderId(col.orderId);
-    setSelectUserId(col.userId);
+    open()
 
-    open();
   };
 
   const closeOrder = (row) => {
@@ -80,7 +87,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     );
   };
 
-  const openOrder = (row: {
+  const openOrder = async (row: {
     count: string;
     id: string;
     name: string;
@@ -89,12 +96,13 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     side: string;
     userId: string;
   }) => {
-    setSelectName(row.name);
-    setOrderType("open");
-    setSelectCount("0");
-    setCloseSide("buy");
-    setSelectOrderId(row.orderId);
-    setSelectUserId(row.userId);
+     setSelectName(row.name);
+     setOrderType("open");
+     setSelectCount("0");
+     setCloseSide("buy");
+     setSelectOrderId(row.orderId);
+     setSelectUserId(row.userId);
+     setIsReady(true);
 
     open();
   };
@@ -105,6 +113,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     count: string,
     side: string,
   ) => {
+    setIsReady(false);
     console.log(
       "Params :::",
       orderType,
@@ -115,14 +124,14 @@ export default function InfoTableGroupTemplate({ value }: Props) {
       selectOrderId,
     );
 
-    // accountApi.callOrder(
-    //   orderType,
-    //   selectUserId,
-    //   selectOrderId,
-    //   name,
-    //   count,
-    //   side,
-    // );
+    accountApi.callOrder(
+      orderType,
+      selectUserId,
+      selectOrderId,
+      name,
+      count,
+      side,
+    );
   };
 
   const renderSubRow = () => {
@@ -160,10 +169,10 @@ export default function InfoTableGroupTemplate({ value }: Props) {
                 index,
               ) => (
                 <tr key={index} className="hover:bg-gray-50 transition">
-                  <td className="px-4 py-2 border-b">{item.side}</td>
+                  <td className={`px-4 py-2 border-b ${item.side === 'buy' ? 'text-green-400' : 'text-blue-400'}`}>{item.side}</td>
                   <td className="px-4 py-2 border-b">{item.price}</td>
                   <td className="px-4 py-2 border-b">{item.count}</td>
-                  <td className="px-4 py-2 border-b">{item.pnl.toFixed(3)}</td>
+                  <td className={`${'px-4 py-2 border-b'} ${item.pnl === 0 ? '' : item.pnl > 0 ? 'text-green-400' : 'text-red-400'}`}>{item.pnl.toFixed(3)}</td>
                   <td className="px-4 py-2 border-b text-center">
                     <button
                       className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer transition"
@@ -189,6 +198,13 @@ export default function InfoTableGroupTemplate({ value }: Props) {
     { key: "", label: "정리", button: true, onButtonClick: closeOrder },
   ];
 
+  useEffect(() => {
+    if (isReady) {
+      open();
+      setIsReady(false); // 다시 초기화
+    }
+  }, [isReady, orderType, selectCount, closeSide, selectOrderId, selectUserId]);
+
   return (
     // <ResponsiveGridLayout cols={1}>
     <div className="p-6 space-y-10">
@@ -202,11 +218,14 @@ export default function InfoTableGroupTemplate({ value }: Props) {
                   selected={selectedGroup === item.userId}
                   onSelect={() => onRowSelect(item)}
                 >
-                  <Label text="Two" theme={"blue"} />
+                  <Label text=  {item.userName} theme={"blue"} />
                   <div className={"m-1 inline-block float-right"}>
-                    <Title level={4} align="right">
-                      {item.userName}
+                    <Title level={3} align="right" className={"inline-block"}> {(item.balance.total+item.balance.unrealisedPnl).toFixed(3)}</Title>
+                    <Title level={5} align="right">
+
+                      &nbsp;({ (item.balance.free+item.balance.unrealisedPnl).toFixed(3)})
                     </Title>
+
                   </div>
                 </SelectableBox>
                 <div className={"mb-4"}></div>

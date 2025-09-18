@@ -21,15 +21,23 @@ interface OrderBuyModalProps {
 export default function OrderBuyModal(props: OrderBuyModalProps) {
   const { name, onSave, count, side, id, orderTYpe } = props;
   const [countValue, setCountValue] = useState(count);
-  const [selectSide, setSelectSide] = useState(side);
+  const [selectSide, setSelectSide] = useState("");
+  //
+  // console.log("INIT SIDE :;;",side)
 
   useEffect(() => {
     setCountValue(count);
   }, [count]);
 
   useEffect(() => {
+    console.log("side :::", side )
     setSelectSide(side);
   }, [side]);
+
+
+  useEffect(()=>{
+    console.log('selectSide :::' , selectSide)
+  },[selectSide])
 
   return (
     <Modal
