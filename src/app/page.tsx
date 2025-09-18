@@ -4,16 +4,18 @@ import { WalletSummary } from "@/templates/Summary/WalletSummary";
 import ChartSummary from "@/templates/Summary/ChartSummary";
 import ThemeToggleSwitch from "@/components/Switch/ThemeToggleSwitch";
 import GroupSummary from "@/templates/Summary/GroupSummary";
+import LineChartWithAnnotation from "@/components/Chart/LineChart";
 
 export default function Home() {
   return (
     <div>
-      <div>
-        <WalletSummary />
-      </div>
-      <div>
-        <GroupSummary />
-      </div>
+        <LineChartWithAnnotation/>
+      {/*<div>*/}
+      {/*  <WalletSummary />*/}
+      {/*</div>*/}
+      {/*<div>*/}
+      {/*  <GroupSummary />*/}
+      {/*</div>*/}
     </div>
   );
 }
