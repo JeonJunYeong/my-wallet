@@ -11,6 +11,7 @@ import { Label } from "@/components/Label/Label";
 import { Box } from "@/components/Box/Box";
 import { SelectableBox } from "@/components/Box/SelectableBox";
 import { Title } from "@/components/Text/Title";
+import LineChartWithAnnotation from "@/components/Chart/LineChart";
 type Props = {
   value: string;
 };
@@ -37,6 +38,9 @@ export default function InfoTableGroupTemplate({ value }: Props) {
   const [selectOrderId, setSelectOrderId] = useState("");
   const [isReady, setIsReady] = useState(false);
 
+  const [labels, setLabels] = useState([]);
+
+
   useEffect(() => {
     getAccountInfo().then((data) => setData(data));
   }, []);
@@ -52,7 +56,26 @@ export default function InfoTableGroupTemplate({ value }: Props) {
 
   const onDetailRowSelect = async (data) => {
     const result = await accountApi.getDetailOrderInfo(data.name, data.userId);
-    setDetailDataOrderInfo(result.sort((a, b) => {
+    const price = result.price;
+    const labels = price.map(item=>{return {
+      x:item.time,
+      y:item.closePrice
+    }});
+    setLabels(labels);
+
+    const buyData =[];
+
+    result.data.forEach(item=>{
+      if(item.side === "buy"){
+
+      }else{
+
+      }
+
+    });
+
+
+    setDetailDataOrderInfo(result.data.sort((a, b) => {
       // 1️⃣ side 문자열 기준 정렬
       const sideCompare = a.side.localeCompare(b.side, 'en', { sensitivity: 'base' });
       if (sideCompare !== 0) return sideCompare;
@@ -61,6 +84,7 @@ export default function InfoTableGroupTemplate({ value }: Props) {
       return b.pnl - a.pnl; // 오름차순
       // return b.count - a.count; // 내림차순
     }));
+
     setSelectName(data.name);
   };
 
@@ -158,6 +182,9 @@ export default function InfoTableGroupTemplate({ value }: Props) {
             </tr>
           </thead>
           <tbody>
+            {
+              // <Box><LineChartWithAnnotation labels={labels}/></Box>
+            }
             {detailDataOrderInfo.map(
               (
                 item: {

@@ -27,31 +27,33 @@ ChartJS.register(
 
 interface LineChartWithAnnotationProps {
     labels: string[];
-    buyData: {price: number,count:number}[];
-    sellData: {price: number,count:number}[];
-
+    // buyData: {price: number,count:number}[];
+    // sellData: {price: number,count:number}[];
 }
 
-const LineChartWithAnnotation: React.FC = () => {
+const LineChartWithAnnotation: React.FC = ({labels} :LineChartWithAnnotationProps) => {
 
-
+    console.log(labels)
 
     const data = {
-        labels: ["09/15 13:00", "09/15 14:00", "09/15 15:00", "09/15 16:00", "09/15 17:00"],
+        // labels:labels,
         datasets: [
             {
-                label: "매출 A",
-                data: [10, 20, 15, 25, 30], // 1월~5월 모두 있음
-                borderColor: "blue",
-                backgroundColor: "rgba(0,0,255,0.3)",
+                data:labels
             },
-            {
-                label: "매출 B",
-                data: [0, 18, 0, 28, 35],
-                // 1월, 3월 데이터가 없음 → null로 채우면 라벨 맞음
-                borderColor: "green",
-                backgroundColor: "rgba(0,255,0,0.3)",
-            },
+            // {
+            //     label: "매출 A",
+            //     data: [10, 20, 15, 25, 30], // 1월~5월 모두 있음
+            //     borderColor: "blue",
+            //     backgroundColor: "rgba(0,0,255,0.3)",
+            // },
+            // {
+            //     label: "매출 B",
+            //     data: [0, 18, 0, 28, 35],
+            //     // 1월, 3월 데이터가 없음 → null로 채우면 라벨 맞음
+            //     borderColor: "green",
+            //     backgroundColor: "rgba(0,255,0,0.3)",
+            // },
         ],
     };
 
